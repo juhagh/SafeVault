@@ -1,0 +1,11 @@
+@model SafeVault.Models.UserInput
+
+<form asp-action="Submit" method="post">
+    <label>Username:</label>
+    <input asp-for="Username" />
+
+    <label>Email:</label>
+    <input asp-for="Email" />
+
+    <button type="submit">Submit</button>
+</form>

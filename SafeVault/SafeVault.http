@@ -1,0 +1,26 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=JetBrains Rider
+
+###
+
+POST http://localhost:5062/SafeVault/Submit
+Content-Type: application/x-www-form-urlencoded
+
+username=testuser&email=test@example.com
+
+###
+
+POST http://localhost:5062/SafeVault/Submit
+Content-Type: application/x-www-form-urlencoded
+
+username=<script>alert(1)</script>&email=test@example.com
+
+###
+
+POST http://localhost:5062/SafeVault/Submit
+Content-Type: application/x-www-form-urlencoded
+
+username=' OR 1=1 --&email=test@example.com
+
+
