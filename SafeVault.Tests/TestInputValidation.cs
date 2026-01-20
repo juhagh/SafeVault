@@ -1,32 +1,40 @@
 using NUnit.Framework;
 using SafeVault.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace SafeVault.Tests
 {
-    [TestFixture]
     public class TestInputValidation
     {
         [Test]
-        public void TestForSQLInjection()
+        public void Username_ShouldReject_SQLInjection()
         {
-            TestContext.WriteLine("Running TestForSQLInjection");
-            
-            string maliciousInput = "' OR 1=1 --";
-            string sanitized = UserInput.Sanitize(maliciousInput);
-            
-            Assert.That(sanitized.Contains("'"), Is.False);
-            Assert.That(sanitized.Contains("--"), Is.False);
+            var input = new UserInput
+            {
+                Username = "admin' OR '1'='1",
+                Email = "test@test.com"
+            };
+
+            var results = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
+
+            Assert.That(isValid, Is.False);
         }
 
         [Test]
-        public void TestForXSS()
+        public void Username_ShouldReject_XSS()
         {
-            TestContext.WriteLine("Running TestForXSS");
-            
-            string maliciousScript = "<script>alert('xss')</script>";
-            string sanitized = UserInput.Sanitize(maliciousScript);
+            var input = new UserInput
+            {
+                Username = "<script>alert(1)</script>",
+                Email = "test@test.com"
+            };
 
-            Assert.That(sanitized.Contains("<script>"), Is.False);
+            var results = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
+
+            Assert.That(isValid, Is.False);
         }
     }
 }

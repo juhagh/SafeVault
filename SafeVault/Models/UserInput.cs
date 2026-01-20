@@ -3,27 +3,35 @@ using System.Text.RegularExpressions;
 
 namespace SafeVault.Models
 {
-    public class UserInput
+    public class UserInput : IValidatableObject
     {
         [Required]
-        [StringLength(100)]
-        public string Username { get; set; }
+        [StringLength(50)]
+        public string Username { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
-        // Sanitization helper
-        public static string Sanitize(string input)
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (string.IsNullOrEmpty(input))
-                return input;
+            // Reject SQL injection patterns
+            if (Regex.IsMatch(Username, @"('|--|;|\bOR\b|\bAND\b)", RegexOptions.IgnoreCase))
+            {
+                yield return new ValidationResult(
+                    "Username contains invalid or dangerous characters.",
+                    new[] { nameof(Username) }
+                );
+            }
 
-            // Remove script tags & special characters
-            input = Regex.Replace(input, "<.*?>", string.Empty);
-            input = Regex.Replace(input, @"[;'""--]", string.Empty);
-
-            return input;
+            // Reject XSS patterns
+            if (Regex.IsMatch(Username, @"<.*?>"))
+            {
+                yield return new ValidationResult(
+                    "Username contains script-like content.",
+                    new[] { nameof(Username) }
+                );
+            }
         }
     }
 }

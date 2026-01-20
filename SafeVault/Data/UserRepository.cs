@@ -1,5 +1,4 @@
 using Microsoft.Data.SqlClient;
-
 using SafeVault.Models;
 
 namespace SafeVault.Data
@@ -15,9 +14,11 @@ namespace SafeVault.Data
             {
                 command.Parameters.AddWithValue("@Username", user.Username);
                 command.Parameters.AddWithValue("@Email", user.Email);
-                
-                // Execution intentionally omitted
+                // Execution intentionally omitted (simulation only)
             }
+
+            // In-memory persistence for demo/testing
+            FakeDatabase.Add(user);
         }
 
         // Fake in-memory store

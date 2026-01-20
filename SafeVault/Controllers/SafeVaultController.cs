@@ -1,11 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using SafeVault.Models;
 using SafeVault.Data;
+using SafeVault.Security;
 
 namespace SafeVault.Controllers
 {
     public class SafeVaultController : Controller
     {
+        private readonly UserRepository _repository;
+
+        public SafeVaultController(UserRepository repository)
+        {
+            _repository = repository;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -16,14 +24,20 @@ namespace SafeVault.Controllers
         public IActionResult Submit(UserInput input)
         {
             if (!ModelState.IsValid)
-                return View("Index");
+            {
+                return View("Index", input);
+            }
 
-            // Sanitize inputs
-            input.Username = UserInput.Sanitize(input.Username);
-            input.Email = UserInput.Sanitize(input.Email);
+            // 🔐 Sanitize inputs (AI-assisted fix)
+            var sanitizedUser = new UserInput
+            {
+                Username = InputSanitizer.Sanitize(input.Username),
+                Email = InputSanitizer.Sanitize(input.Email)
+            };
 
-            // Simulated persistence
-            UserRepository.FakeDatabase.Add(input);
+            // ✅ Correct repository method
+            _repository.SaveUser(sanitizedUser);
+
             return View("Success");
         }
     }
